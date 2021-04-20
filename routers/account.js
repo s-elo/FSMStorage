@@ -17,14 +17,12 @@ router.post("/register", async (req, res) => {
     errHandler();
   });
 
-  console.log(userArr);
+  // console.log(userArr);
   if (userArr.length !== 0) {
-    // const token = jwt.generateToken(req.body);
-    // console.log(token);
-    // const result = jwt.verifyToken(token);
-
-    // console.log(result);
-    return res.send({ errStatus: 1 });
+    return res.send({
+      message: "can not use this email or account name",
+      errStatus: 1,
+    });
   }
 
   const encypedPassword = md5(password);
@@ -34,7 +32,11 @@ router.post("/register", async (req, res) => {
       errHandler();
     }
 
-    return res.send({ ...req.body, errStatus: 0, password: encypedPassword });
+    return res.send({
+      message: "account created successfully!",
+      errStatus: 0,
+      ...req.body,
+    });
   });
 });
 
@@ -60,6 +62,8 @@ router.post("/login", async (req, res) => {
       .send({ status: 1, message: "wrong password or account" });
   }
 });
+
+router.get("/userInfo", async (req, res) => {});
 
 function errHandler() {
   return res.status(500).json({
