@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   data: [],
-  status: {
+  userStatus: {
     type: Number,
     // 0: normal; 1: VIP
     enum: [0, 1],

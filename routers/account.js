@@ -55,15 +55,41 @@ router.post("/login", async (req, res) => {
   if (user && md5(password) === user.password) {
     // add token
     const token = jwt.generateToken(user);
-    return res.send({ token, status: 0, message: "login successfully" });
+    return res.send({ token, errStatus: 0, message: "login successfully" });
   } else {
-    return res
-      .stauts(400)
-      .send({ status: 1, message: "wrong password or account" });
+    return res.send({ errStatus: 1, message: "wrong password or account" });
   }
 });
 
-router.get("/userInfo", async (req, res) => {});
+router.get("/userInfo", async (req, res) => {
+  const token = req.headers.authorization;
+
+  const verifyRes = jwt.verifyToken(token);
+
+  if (verifyRes === "error") {
+    return res.send({
+      errStatus: 1,
+      message: "token has expired, please login again",
+    });
+  }
+
+  const user = await Users.findOne({
+    _id: verifyRes._id,
+  }).catch(() => {
+    errHandler();
+  });
+
+  if (user) {
+    const { accountName, email, userStatus } = user;
+
+    return res.send({
+      errStatus: 0,
+      userInfo: { accountName, email, userStatus },
+    });
+  } else {
+    return res.send({ errStatus: 2, message: "no such user" });
+  }
+});
 
 function errHandler() {
   return res.status(500).json({
