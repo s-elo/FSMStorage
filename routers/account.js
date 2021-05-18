@@ -8,6 +8,7 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
   //   console.log("get it by post", req.headers.origin);
   // console.log(req.body);
+  console.log("register");
   const { accountName, email, password } = req.body;
 
   // see if the user has already exsit
@@ -41,7 +42,8 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
+  console.log("login");
   const { accountName, password } = req.body;
 
   const user = await Users.findOne({
@@ -55,13 +57,14 @@ router.post("/login", async (req, res) => {
   if (user && md5(password) === user.password) {
     // add token
     const token = jwt.generateToken(user);
-    return res.send({ token, errStatus: 0, message: "login successfully" });
+    return res.send({ token, errStatus: 0 });
   } else {
     return res.send({ errStatus: 1, message: "wrong password or account" });
   }
 });
 
 router.get("/userInfo", async (req, res) => {
+  console.log("getUserInfo");
   const token = req.headers.authorization;
 
   const verifyRes = jwt.verifyToken(token);
