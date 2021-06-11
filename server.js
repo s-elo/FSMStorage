@@ -12,7 +12,8 @@ app.use(bodyParser.json({ limit: "50mb" }));
 // Cross-Origin Resource Sharing
 app.all("*", (req, res, next) => {
   // console.log(req.headers.origin);
-  res.header("Access-Control-Allow-Origin", `http://127.0.0.1:3080`);
+  // localhost和127.0.0.1are different...
+  res.header("Access-Control-Allow-Origin", `http://localhost:3080`);
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE, PUT");
   // for token header
   res.header("Access-Control-Allow-Headers", "authorization");

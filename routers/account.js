@@ -52,11 +52,12 @@ router.post("/login", async (req, res) => {
     errHandler();
   });
 
-  // console.losg(user);
+  // console.log(user);
   // send a token if password is correct
   if (user && md5(password) === user.password) {
     // add token
     const token = jwt.generateToken(user);
+
     return res.send({ token, errStatus: 0 });
   } else {
     return res.send({ errStatus: 1, message: "wrong password or account" });
