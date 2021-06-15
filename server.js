@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const loginRouter = require("./routers/account.js");
+const mongoose = require("mongoose");
+const accountRouter = require("./routers/account.js");
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.all("*", (req, res, next) => {
   next();
 });
 
-app.use(loginRouter);
+app.use(accountRouter);
 
 // app.get("/", (req, res) => {
 //   console.log("get it by get", req.headers.origin);
@@ -28,6 +29,16 @@ app.use(loginRouter);
 //   return res.send(req.query);
 // });
 
-app.listen(port, () => {
-  console.log(`running at ${port}...`);
+mongoose.connect("mongodb://localhost/FSMUsers", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", function () {
+  console.log("connected the mongoDB");
+  app.listen(port, () => {
+    console.log(`running at ${port}...`);
+  });
 });
