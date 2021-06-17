@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const accountRouter = require("./routers/account.js");
+const dataRouter = require("./routers/data.js");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use(accountRouter);
+app.use(dataRouter);
 
 // app.get("/", (req, res) => {
 //   console.log("get it by get", req.headers.origin);
@@ -32,6 +34,8 @@ app.use(accountRouter);
 mongoose.connect("mongodb://localhost/FSMUsers", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  // avoid the warning when using findOneAndUpdate
+  useFindAndModify: false,
 });
 
 const db = mongoose.connection;

@@ -11,7 +11,7 @@ router.post("/register", async (req, res) => {
   console.log("register");
   const { accountName, email, password } = req.body;
 
-  // see if the user has already exsit
+  // see if the user has already exist
   const userArr = await Users.find({
     $or: [{ accountName: accountName }, { email: email }],
   }).catch(() => {
@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
 
   // console.log(userArr);
   if (userArr.length !== 0) {
-    return res.send({
+    return res.status(403).json({
       message: "can not use this email or account name",
       errStatus: 1,
     });
@@ -60,7 +60,9 @@ router.post("/login", async (req, res) => {
 
     return res.send({ token, errStatus: 0 });
   } else {
-    return res.send({ errStatus: 1, message: "wrong password or account" });
+    return res
+      .status(403)
+      .json({ errStatus: 1, message: "wrong password or account" });
   }
 });
 
@@ -71,7 +73,7 @@ router.get("/userInfo", async (req, res) => {
   const verifyRes = jwt.verifyToken(token);
 
   if (verifyRes === "error") {
-    return res.send({
+    return res.status(403).json({
       errStatus: 1,
       message: "token has expired, please login again",
     });
@@ -91,13 +93,14 @@ router.get("/userInfo", async (req, res) => {
       userInfo: { accountName, email, userStatus },
     });
   } else {
-    return res.send({ errStatus: 2, message: "no such user" });
+    return res.status(403).json({ errStatus: 2, message: "no such user" });
   }
 });
 
 function errHandler() {
   return res.status(500).json({
     errStatus: 2,
+    message: 'something in server...'
   });
 }
 
