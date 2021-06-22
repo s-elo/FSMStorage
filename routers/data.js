@@ -17,44 +17,74 @@ router.post("/save", async (req, res) => {
 
   const { entityName } = JSON.parse(req.body.data);
 
-  // see if the entityName has been used repeatly
+  // update if the entityName has been used
   if (data.includes(entityName)) {
-    return res.status(400).json({
-      errStatus: 2,
-      message: "The entityName has already been existed",
-    });
-  }
+    try {
+      await Datas.findOneAndUpdate(
+        { entityName, accountName },
+        { data: req.body.data }
+      );
+    } catch {
+      return res.status(500).json({
+        errStatus: 1,
+        message: "Cannot save, something wrong here~",
+      });
+    }
+  } else {
+    // save the data if the entityName has not been used
+    try {
+      await new Datas({
+        accountName,
+        entityName,
+        data: req.body.data,
+      }).save();
+    } catch {
+      return res.status(500).json({
+        errStatus: 1,
+        message: "Cannot save, something wrong here~",
+      });
+    }
 
-  // save the data
-  try {
-    await new Datas({
-      accountName,
-      entityName,
-      data: req.body.data,
-    }).save();
-  } catch {
-    return res.status(500).json({
-      errStatus: 1,
-      message: "Cannot save, something wrong here~",
-    });
-  }
+    // update the datas of the corresponding account
+    data.push(entityName);
 
-  // update the datas of the corresponding account
-  data.push(entityName);
-
-  try {
-    await Users.findOneAndUpdate({ accountName }, { data });
-  } catch {
-    return res.status(500).json({
-      errStatus: 1,
-      message: "Cannot update the account, something wrong here~",
-    });
+    try {
+      await Users.findOneAndUpdate({ accountName }, { data });
+    } catch {
+      return res.status(500).json({
+        errStatus: 1,
+        message: "Cannot update the account, something wrong here~",
+      });
+    }
   }
 
   return res.send({
     errStatus: 0,
     message: "save successfully~",
   });
+});
+
+router.get("/getFSM", async (req, res) => {
+  const { entityName } = req.query;
+
+  const token = req.headers.authorization;
+
+  const user = await verifyUser(token);
+
+  const { accountName } = user;
+
+  try {
+    const fsm = await Datas.findOne({ accountName, entityName });
+
+    const { data } = fsm;
+
+    return res.send({ data, errStatus: 0 });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ errStatus: 2, message: "something wrong in server" });
+  }
 });
 
 async function verifyUser(token) {

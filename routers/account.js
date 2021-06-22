@@ -86,11 +86,9 @@ router.get("/userInfo", async (req, res) => {
   });
 
   if (user) {
-    const { accountName, email, userStatus } = user;
-
     return res.send({
       errStatus: 0,
-      userInfo: { accountName, email, userStatus },
+      userInfo: user,
     });
   } else {
     return res.status(403).json({ errStatus: 2, message: "no such user" });
