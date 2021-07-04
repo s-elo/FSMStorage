@@ -67,7 +67,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/userInfo", async (req, res) => {
-  console.log("getUserInfo");
+  // console.log("getUserInfo");
   const token = req.headers.authorization;
 
   const verifyRes = jwt.verifyToken(token);

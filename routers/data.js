@@ -2,7 +2,7 @@ const express = require("express");
 const Users = require("../models/users.js");
 const Datas = require("../models/stateDiagram.js");
 
-const md5 = require("blueimp-md5");
+// const md5 = require("blueimp-md5");
 const jwt = require("../authorization/tokenHanler.js");
 
 const router = express.Router();
@@ -62,6 +62,36 @@ router.post("/save", async (req, res) => {
     errStatus: 0,
     message: "save successfully~",
   });
+});
+
+router.post("/delete", async (req, res) => {
+  // console.log(req.body);
+  // delete according to the entityName and the accountName
+  const { entityName } = req.body;
+
+  const token = req.headers.authorization;
+
+  const user = await verifyUser(token);
+
+  const { accountName, data } = user;
+
+  try {
+    await Datas.deleteOne({ accountName, entityName });
+
+    const newData = data.filter((v) => v !== entityName);
+
+    await Users.findOneAndUpdate({ accountName }, { data: newData });
+
+    return res.json({
+      errStatus: 0,
+      message: "delete successfully~",
+    });
+  } catch {
+    return res.status(500).json({
+      errStatus: 1,
+      message: "Cannot delete the FSM, please try again~",
+    });
+  }
 });
 
 router.get("/getFSM", async (req, res) => {
